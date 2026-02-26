@@ -46,3 +46,8 @@ man cut
 vim twocol.sh 
 sed -d /^#/ h.t 
 history -a
+
+So as you can see I was using unix tools (coreutils)
+until finally I realised I would hvae to do a c program
+and ones you do that, well, you end up doing all the things the unix tools
+did.

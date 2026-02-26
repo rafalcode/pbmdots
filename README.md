@@ -6,3 +6,7 @@ using a threshold (50% is good).
 # pixels to dot
 So a key problem is that what looks like a dot is usually more than one pixel. Well if it was 3, fine
 or any odd number in fact, that's not so bad, but often it is two pixels. Right so, which one to choose?
+
+# proceduew
+use onesrd to read the pbm and output the coordinates of ones.
+

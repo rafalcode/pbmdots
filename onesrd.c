@@ -157,13 +157,43 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    int i;
+    int i,j;
     size_t nr, nc;
     px_t *px=processinpf(argv[1], &nr, &nc);
 
-    for(i=0;i<px->sz;++i)
-        printf("(%i,%i) ", px[i].x, px[i].y);
-    printf("\n"); 
+    // alternative printing methods:
+    // for(i=0;i<px->sz;++i)
+    //     printf("(%i,%i) ", px[i].x, px[i].y);
+    // printf("\n"); 
+    //
+    // x on one row csv'd
+    // for(j=0;j<px->sz;++j)
+    //     printf((j!=px->sz-1)?"%i,":"%i\n", px[j].x);
+    // y on one row csv'd
+    // for(j=0;j<px->sz;++j)
+    //     printf((j!=px->sz-1)?"%i,":"%i\n", px[j].y);
+    for(j=0;j<px->sz;++j)
+        printf("%i,%i\n", px[j].x, px[j].y);
+
+    // for(j=0;j<n;++j) {
+    //     prev = mat[j]; // first row-number each time
+    //     cou=1;
+    //     for(i=1;i<m;++i) {
+    //         if(prev==mat[i*n+j]) {
+    //             cou++;
+    //             if(i==(m-1))
+    //                 printf("%ix%i ", prev, cou);
+    //         } else {
+    //             if(cou==1)
+    //                 printf("%i ", prev);
+    //             else
+    //                 printf("%ix%i ", prev, cou);
+    //             cou=1;
+    //             prev=mat[i*n+j];
+    //         }
+    //     }
+    //      printf("\n"); 
+    // }
 
     free(px);
 
