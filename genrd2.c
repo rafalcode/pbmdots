@@ -8,8 +8,24 @@
 #define GBUF 8
 #define WBUF 8
 #define TOPLINES 2
+#define SZBX 2
+
+//from manual inspection
+#define BLANKBLOCKX 57
+#define BLANKBLOCKY 28
+
+#define CONDREALLOC(x, b, c, a, t); \
+    if((x)>=((b)-1)) { \
+        (b) += (c); \
+        (a)=realloc((a), (b)*sizeof(t)); \
+    }
 
 typedef unsigned char boole;
+
+typedef struct /* px_c */
+{
+    int x,y;
+} px_t;
 
 typedef struct /* wseq_t */
 {
@@ -20,6 +36,42 @@ typedef struct /* wseq_t */
     size_t numl; /* number of lines, i.e. rows */
     size_t *wpla; /* words per line array: the number of words on each line */
 } wseq_t;
+
+typedef struct /* av_c */
+{
+    int vbf, vsz;
+    px_t *p;
+} av_c;
+
+av_c *crea_avc(int vbf)
+{
+    av_c *avc=malloc(sizeof(av_c));
+    avc->vbf=vbf;
+    avc->p=malloc(avc->vbf*sizeof(px_t));
+    avc->vsz=0;
+    return avc;
+}
+
+void condrea_avc(av_c *avc)
+{
+    /* somewhat trivial, but idea is that, as avc is a container, it can be re-alloced inside a function */
+    CONDREALLOC(avc->vsz, avc->vbf, GBUF, avc->p, px_t);
+    return;
+}
+
+void norm_avc(av_c *avc)
+{
+    /* somewhat trivial, but idea is that, as avc is a container, it can be re-alloced inside a function */
+    avc->p=realloc(avc->p, avc->vsz*sizeof(px_t));
+    return;
+}
+
+void free_avc(av_c *avc)
+{
+    free(avc->p);
+    free(avc);
+    return;
+}
 
 wseq_t *create_wseq_t(size_t initsz)
 {
@@ -137,10 +189,18 @@ int *processinpf(char *fname, int *m, int *n)
     return mat;
 }
 
+void postpromat(int *mat, int n, int blx, int bly) /* manual inspection allows to blank out a big square: topleft */
+{
+    int i, j;
+    for(i=0;i<bly;++i) 
+        for(j=0;j<blx;++j) 
+            mat[n*i+j]=0;
+}
+
 void plainprt(int *mat, int m, int n)
 {
     int i, j;
-    // printf("Matrix is %i rows by %i columns and is as follows:\n", m, n); 
+    printf("Matrix is %i rows by %i columns and is as follows:\n", m, n); 
     // plain print:
     for(i=0;i<m;++i) {
         for(j=0;j<n;++j) 
@@ -149,15 +209,66 @@ void plainprt(int *mat, int m, int n)
     }
 }
 
-void plainprt2(int *mat, int m, int n)
+void emuim(av_c *avc, int m, int n) /* emulate the image with avec */
 {
     int i, j;
-    // plain print:
+    unsigned char *mat2=calloc(m*n, sizeof(unsigned char));
+    for(i=0;i<avc->vsz;++i)
+        mat2[n*avc->p[i].y + avc->p[i].x]=1; 
+
     for(i=0;i<m;++i) {
         for(j=0;j<n;++j) 
-            printf((mat[i*n+j]==0)? " " :"1");
+            printf((mat2[i*n+j]==0)? " ": "1");;
         printf("\n"); 
     }
+    free(mat2);
+}
+
+void twos(unsigned char *oc, int m, int n, av_c *avc)
+{
+    int i, j;
+    // identifying the isolated clums of 1's and assigning an index.
+    // to make code simple it's useful to have a number that always appears. 2 does. so does 1, but, 2 is easier.
+    // it ise unique except in 1011, we will skip that.
+    // then index assignment need only vary for 2 of the 8 types.
+    // perhaps I should write up why there are only 8 types. see procedure.txt
+    int tcou=0;
+    for(i=0;i<m-SZBX+1;++i)
+        for(j=0;j<n-SZBX+1;++j) {
+            if(oc[(n-SZBX+1)*i+j]==2) {
+                tcou++;
+                if(oc[(n-SZBX+1)*i+j-1]==0x0B) // 1011(B) before it, 2 appears twice in this one (otherwise it is unique) - do not count
+                    continue;
+                if(oc[(n-SZBX+1)*(i-1)+j-1]==0x07) {
+                    // 0111, we chose bottom left 1 so two directly below
+                    avc->p[avc->vsz].x=j;
+                    avc->p[avc->vsz++].y=i+2;
+                } else if(oc[(n-SZBX+1)*(i-1)+j-1]==0x0E) {
+                    avc->p[avc->vsz].x=j-1;
+                    avc->p[avc->vsz++].y=i; // because it's 0111
+                } else {
+                    // default choose index directly below.
+                    avc->p[avc->vsz].x=j;
+                    avc->p[avc->vsz++].y=i+1; // because it's 0111
+                }
+            }
+        }
+    // printf("#twos:%i\n", tcou); 
+}
+
+void ones(unsigned char *oc, int m, int n, av_c *avc)
+{
+    int i, j;
+    int tcou=0;
+    for(i=0;i<m-SZBX+1;++i) {
+        for(j=0;j<n-SZBX+1;++j) {
+            if(oc[(n-SZBX+1)*i+j]==2) {
+                printf("oc-ij:%X ocijm1:%X\n", oc[(n-SZBX+1)*i+j], oc[(n-SZBX+1)*(i+1)+j-1]);
+                tcou++;
+            }
+        }
+    }
+    printf("#ones:%i\n", tcou); 
 }
 
 int main(int argc, char *argv[])
@@ -171,36 +282,47 @@ int main(int argc, char *argv[])
     int i, j, m, n;
     int *mat=processinpf(argv[1], &m, &n);
 
-    plainprt2(mat, m, n);
-    
-    // transposed print: better on the eyes.
-    // for(j=0;j<n;++j) {
-    //     for(i=0;i<m;++i)
-    //         printf("%i ", mat[i*n+j]);
+    postpromat(mat, n, BLANKBLOCKX, BLANKBLOCKY);
+    // plainprt(mat, m, n);
+
+    unsigned char t;
+
+    av_c *avc=crea_avc(GBUF);
+    unsigned char *oc = calloc((m-SZBX+1)*(n-SZBX+1), sizeof(unsigned char));
+
+    // Set 2x2 neighbourhood for each pixel.
+    // last column and last row cannot have points.
+    for(i=0;i<m-SZBX+1;++i)
+        for(j=0;j<n-SZBX+1;++j) {
+            t=0x00;
+            t=(0x01&mat[i*n+j])<<3;
+            t|=(0x01&mat[i*n+j+1])<<2;
+            t|=(0x01&mat[(i+1)*n+j])<<1;
+            t|=0x01&mat[(i+1)*n+j+1];
+            oc[(n-SZBX+1)*i+j] =t;
+        }
+    twos(oc, m, n, avc); // populates avc
+    // ones(oc, m, n, avc);
+
+    // unsigned char tc;
+    // for(i=0;i<m-SZBX+1;++i) {
+    //     for(j=0;j<n-SZBX+1;++j) {
+    //         tc = (oc[(n-SZBX+1)*i+j] ==0)? ' ' : oc[(n-SZBX+1)*i+j];
+    //         printf((tc==' ')? "%c" : "%X", tc);
+    //     }
     //     printf("\n"); 
     // }
-    int prev, cou;
-    // for(j=0;j<n;++j) {
-    //     prev = mat[j]; // first row-number each time
-    //     cou=1;
-    //     for(i=1;i<m;++i) {
-    //         if(prev==mat[i*n+j]) {
-    //             cou++;
-    //             if(i==(m-1))
-    //                 printf("%ix%i ", prev, cou);
-    //         } else {
-    //             if(cou==1)
-    //                 printf("%i ", prev);
-    //             else
-    //                 printf("%ix%i ", prev, cou);
-    //             cou=1;
-    //             prev=mat[i*n+j];
-    //         }
-    //     }
-    //      printf("\n"); 
-    // }
+
+    // for(i=0;i<avc->vsz;++i)
+    //     printf("(%i,%i) ", avc->p[i].x, avc->p[i].y); 
+    // printf("\n"); 
+    // print out points for easy loading onto R
+    for(i=0;i<avc->vsz;++i)
+        printf("%i,%i\n", avc->p[i].x, avc->p[i].y); 
 
     free(mat);
+    free(oc);
+    free_avc(avc);
 
     return 0;
 }

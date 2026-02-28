@@ -7,7 +7,7 @@ BZLIBS=-lbz2
 
 # looking for uov? chekc the juegoca repository
 
-EXECUTABLES=gl0 coordrd prd genrd onesrd
+EXECUTABLES=gl0 coordrd prd genrd onesrd genrd2 genrd3
 
 gl0: gl0.c
 	${CC} ${CFLAGS} -o $@ $^
@@ -19,6 +19,10 @@ coordrd: coordrd.c
 	${CC} ${CFLAGS} -o $@ $^
 # print out pbm in a way the eye can manually verify
 genrd: genrd.c
+	${CC} ${CFLAGS} -o $@ $^
+genrd2: genrd2.c
+	${CC} ${CFLAGS} -o $@ $^
+genrd3: genrd3.c
 	${CC} ${CFLAGS} -o $@ $^
 # get the coords of the ones.
 onesrd: onesrd.c

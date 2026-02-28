@@ -141,11 +141,11 @@ int main(int argc, char *argv[])
 
      printf("Matrix is %i rows by %i columns and is as follows:\n", m, n); 
     // plain print:
-    // for(i=0;i<m;++i) {
-    //     for(j=0;j<n;++j) 
-    //         printf("%i ", mat[i*n+j]);
-    //     printf("\n"); 
-    // }
+    for(i=0;i<m;++i) {
+        for(j=0;j<n;++j) 
+            printf("%i ", mat[i*n+j]);
+        printf("\n"); 
+    }
     // transposed print: better on the eyes.
     // for(j=0;j<n;++j) {
     //     for(i=0;i<m;++i)
