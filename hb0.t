@@ -1,0 +1,214 @@
+vim sednotes.txt 
+e
+cd
+mdc pnm0
+mv ~/croppedclips/croc_20260226_1240_59970.png .
+lr
+convert croc_20260226_1240_59970.png c0.ppm
+file *
+vim c0.ppm 
+lr
+convert croc_20260226_1240_59970.png c0.pbm
+vim c0.pbm
+lr
+convert croc_20260226_1240_59970.png -compress none c0.pbm
+magick croc_20260226_1240_59970.png -compress none c0.pbm
+lr
+vim c0.pbm 
+identify croc_20260226_1240_59970.png
+identify c0.pbm
+wc -l c0.pbm
+head -1 c0.pbm |tr ' ' '\n' |wc -l
+vim c0.pbm 
+magick croc_20260226_1240_59970.png -compress none -wrap 0 c0.pbm
+magick croc_20260226_1240_59970.png -compress none -define pn m:wrap=0 c0.pbm
+magick croc_20260226_1240_59970.png -colorspace Gray -depth 8 -compress none c1.pgm
+vim c1.pgm
+vbr
+sbr
+pngpb croc_20260226_1240_59970.png c2.pbm
+png2pb croc_20260226_1240_59970.png c2.pbm
+vbr
+magick croc_20260226_1240_59970.png -colorspace Gray -threshold 50% txt:- 
+magick croc_20260226_1240_59970.png -colorspace Gray -threshold 50% txt:- >a.t
+vim a.t
+magick croc_20260226_1240_59970.png -colorspace Gray txt:- >a.t
+vim a.t
+magick croc_20260226_1240_59970.png -colorspace Gray -threshold 50% txt:- >a.t
+wc -l a.t
+feh croc_20260226_1240_59970.png 
+sed -e /FFFFFF/d a.t >b.t
+wc -l *.t
+vim b.t 
+vbr
+sbr
+png2pb croc_20260226_1240_59970.png c2.pbm
+vbr
+sbr
+png2pb croc_20260226_1240_59970.png c2.pbm
+lr
+vim c2.pbm 
+vbr
+sbr
+png2pb croc_20260226_1240_59970.png c2.pbm
+vim c2.pbm 
+vim a,sh
+mv a,sh a.sh
+vim a.sh 
+bash a.sh
+lr
+vim fixed.pbm 
+vim a.sh 
+bash a.sh
+vim fixed.pbm 
+vim croc_20260226_1240_59970.png 
+feh croc_20260226_1240_59970.png
+vim fixed.pbm 
+vim a.sh 
+sh b.sh 
+vim fixed.pbm 
+vim a.sh 
+vim b.sh 
+sh b.sh 
+vim fixed.pbm 
+vim b.sh 
+sh b.sh 
+vim fixed.pbm 
+cp b.sh c.sh
+vim c.sh
+sh c.sh 
+vim fixed.pbm 
+vim  c.sh 
+sh c.sh 
+vim  c.sh 
+sh c.sh 
+vim fixed.pbm 
+vim  c.sh 
+sh c.sh 
+vim fixed.pbm 
+vim  c.sh 
+vim a.sh 
+cp a.sh aa.sh
+vim aa.sh
+sh aa.sh
+vim fixed.pbm 
+vim c.sh 
+bash c.sh 
+vim fixed.pbm 
+vim c.sh 
+bash c.sh 
+vim fixed.pbm 
+vim c.sh 
+bash c.sh 
+vim fixed.pbm 
+vim c.sh 
+bash c.sh 
+vim fixed.pbm 
+vim c.sh 
+bash c.sh 
+vim fixed.pbm 
+vim c.sh 
+bash c.sh 
+vim fixed.pbm 
+vim c.sh 
+bash c.sh 
+vim fixed.pbm 
+bash c.sh 
+vim c.sh 
+bash c.sh 
+vim c.sh 
+cp c.sh d.sh
+vim d.sh
+sh d.sh 
+vim d.sh
+sh d.sh 
+vim fixed.pbm 
+vim d.sh
+sh d.sh 
+vim fixed.pbm 
+vim d.sh
+vim fixed.pbm 
+bash b.sh 
+vim fixed.pbm 
+bash c.sh 
+rm c.sh d.sh
+cp b.sh c.sh
+vim c.sh
+sh c.sh 
+vim fixed.pbm 
+vim c.sh
+vim fixed.pbm 
+vim c.sh
+sh c.sh
+vim fixed.pbm 
+vim c.sh
+sh c.sh
+vim fixed.pbm 
+vim c.sh
+sh c.sh
+vim fixed.pbm 
+vim c.sh 
+sh b.sh 
+sh c.sh 
+vim fixed.pbm 
+vim -O fixed.pbm  fixed2.pbm 
+vim c.sh 
+sh c.sh 
+vi fixed2.pbm 
+vim fixed2.pbm
+sh c.sh 
+vim c.sh 
+sh c.sh 
+vim fixed2.pbm
+vim c.sh 
+sh c.sh 
+vim fixed2.pbm
+cp c.sh d.sh
+vim d.sh 
+sh d.sh
+vim fixed2.pbm
+vim d.sh 
+sdn.sh 6 d.sh
+sdn.sh 5 d.sh
+lr
+vim a.t 
+vim b.t 
+head b.t 
+Lq
+head b.t | cut -d"," -f1
+head b.t | cut -d"," -f2
+head b.t | cut -d"," -f0
+head b.t 
+head b.t | cut -d",:" -f1
+head b.t | tr ':' ',' |cut -d"," -f1
+head b.t | tr ':' ',' |cut -d"," -f1 |tr "\n" " " 
+man col
+head b.t | tr ':' ',' |cut -z -d"," -f1 
+man -z
+man cut
+head b.t | tr ':' ',' |cut -d"," -f1 
+head b.t | tr ':' ',' |cut -d"," -f1 |paste
+g_bh col2l.sh
+vim col2l.sh
+vim col2l.sh 
+head b.t >h.t
+tr ':' ',' h.t 
+man tr
+vim col2l.sh 
+bash col2l.sh h.t 1
+bash col2l.sh h.t 2
+vim h.t 
+ltr
+vim col2l.sh 
+cp col2l.sh twocol.sh
+vim twocol.sh
+./twocol.sh h.t 
+man cut
+vim twocol.sh
+./twocol.sh h.t 
+vim twocol.sh
+./twocol.sh h.t 
+man cut
+vim twocol.sh 
+sed -d /^#/ h.t 
+history -a
