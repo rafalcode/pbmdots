@@ -1,3 +1,4 @@
+# handling a p1 pbm file
 awk '
 NR==1 {print; next}
 NR==2 {print; w=$1; next}

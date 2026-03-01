@@ -306,6 +306,44 @@ void twosr(unsigned char *oc, int m, int n, av_c *avc) // reverse the y coord so
     // printf("#twos:%i\n", tcou); 
 }
 
+void twosr2(unsigned char *oc, int m, int n, av_c *avc) // this is for dealing with bigger blocks
+{
+    int i, j;
+    // identifying the isolated clums of 1's and assigning an index.
+    // to make code simple it's useful to have a number that always appears. 2 does. so does 1, but, 2 is easier.
+    // it ise unique except in 1011, we will skip that.
+    // then index assignment need only vary for 2 of the 8 types.
+    // perhaps I should write up why there are only 8 types. see procedure.txt
+    int tcou=0;
+    int to8; // how many steps to the "8" directly below "2"
+    for(i=0;i<m-SZBX+1;++i)
+        for(j=0;j<n-SZBX+1;++j) {
+            if(oc[(n-SZBX+1)*i+j]==2) {
+                tcou++;
+                // get the 2to8"
+                to8=0;
+                while(oc[(n-SZBX+1)*(i+(to8++))+j] != 8) ; // go down, and find the "8". there's nearly always an 8 som e rows under "2"
+                printf("to8=%i\n", to8); 
+                if(oc[(n-SZBX+1)*i+j-1]==0x0B) // 1011(B) before it, 2 appears twice in this one (otherwise it is unique) - do not count
+                    continue;
+                // watch the +1 and -1's these are due the zero indexing to one-indexing change.
+                if(oc[(n-SZBX+1)*(i-1)+j-1]==0x07) {
+                    // 0111, we chose bottom left 1 so two directly below
+                    avc->p[avc->vsz].x=j+1;
+                    avc->p[avc->vsz++].y=m-i-2-1;
+                } else if(oc[(n-SZBX+1)*(i-1)+j-1]==0x0E) {
+                    avc->p[avc->vsz].x=j+1;
+                    avc->p[avc->vsz++].y=m-i-1; // because it's 0111
+                } else {
+                    // default choose index directly below.
+                    avc->p[avc->vsz].x=j+1;
+                    avc->p[avc->vsz++].y=m-i-1; // because it's 0111
+                }
+            }
+        }
+    // printf("#twos:%i\n", tcou); 
+}
+
 void ones(unsigned char *oc, int m, int n, av_c *avc)
 {
     int i, j;
@@ -351,12 +389,9 @@ int main(int argc, char *argv[])
             t|=0x01&mat[(i+1)*n+j+1];
             oc[(n-SZBX+1)*i+j] =t;
         }
-    twosr(oc, m, n, avc); // populates avc
-    // ones(oc, m, n, avc);
+    // prtoc(oc, m, n);
+    twosr2(oc, m, n, avc); // populates avc
 
-    // for(i=0;i<avc->vsz;++i)
-    //     printf("(%i,%i) ", avc->p[i].x, avc->p[i].y); 
-    // printf("\n"); 
     // print out points for easy loading onto R
     printf("# width=%i height=%i\n", n, m);
     for(i=0;i<avc->vsz;++i)
